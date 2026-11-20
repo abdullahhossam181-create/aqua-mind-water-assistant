@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#082f3a"><meta name="description" content="AQUA MIND helps you investigate water problems and find evidence-informed next steps.">
+  <title>AQUA MIND — Understand the water problem</title><link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div><div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="AQUA MIND home"><img src="/logo.png" alt=""><span>AQUA <b>MIND</b><small>WATER INSIGHT · PRACTICAL ACTION</small></span></a>
+    <div class="top-actions"><span class="live"><i></i><span data-i="status">Research-aware assistant</span></span><button id="langToggle" class="lang" type="button">العربية</button></div>
+  </header>
+  <main class="shell">
+    <section class="intro">
+      <div class="eyebrow"><span class="eyebrow-mark">✳</span><span data-i="eyebrow">A CLEARER WAY TO SOLVE WATER PROBLEMS</span></div>
+      <h1 data-i="headline">Every water problem<br><em>has a story.</em></h1>
+      <p class="intro-copy" data-i="subhead">Tell us what you’re seeing. We’ll ask what matters, explore possible causes, and help you decide what to do next.</p>
+    </section>
+    <section class="workspace" aria-live="polite">
+      <nav class="progress" aria-label="Progress">
+        <div class="progress-line"><span id="progressFill"></span></div>
+        <button class="step active" data-step="1"><span class="step-num">01</span><span data-i="step1">Describe</span></button>
+        <button class="step" data-step="2"><span class="step-num">02</span><span data-i="step2">Clarify</span></button>
+        <button class="step" data-step="3"><span class="step-num">03</span><span data-i="step3">Explore</span></button>
+      </nav>
+      <div class="workspace-body">
+        <div class="left-rail"><div class="rail-stamp">AM<span>✳</span></div><p data-i="rail">A better answer starts with the right questions.</p><div class="rail-foot">01 <span>—</span> 03</div></div>
+        <div class="stage" id="stage"></div>
+      </div>
+    </section>
+    <footer><span>© AQUA MIND</span><span data-i="footer">A research-led water problem assistant · Early prototype</span><span class="privacy">⌁ <span data-i="privacy">No account needed</span></span></footer>
+  </main>
+  <script src="/app.js" defer></script>
+</body>
+</html>
