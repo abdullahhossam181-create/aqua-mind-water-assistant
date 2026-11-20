@@ -41,6 +41,14 @@ node server.mjs
 
 Open [http://localhost:4173](http://localhost:4173), or run `Run AQUA MIND.bat` on Windows.
 
+## Deploy a public demo
+
+The repository includes `render.yaml` for a free Render web service. In Render, create a **Blueprint** from this repository and apply the `aqua-mind` service. The free service may sleep after 15 minutes without traffic; its first request after that can take about a minute to wake up.
+
+To enable generated AI questions and web research, add `OPENAI_API_KEY` in the service's **Environment** settings. Never put the key in this repository or browser code. OpenAI API usage may incur charges on the key owner's account. Without a key, the guided prototype and OpenAlex literature search remain available.
+
+When a user requests an assessment, their description and answers go to the AQUA MIND server; with AI enabled, they are also sent to OpenAI. The optional broad area may be used in an OpenAlex search. The form warns users not to enter names or exact addresses. The server applies a basic per-address request limit; this prototype is not hardened for high-traffic production use.
+
 ### Research and AI modes
 
 - Without an API key, the prototype uses guided follow-up questions and attempts to retrieve related academic records from OpenAlex. If research retrieval is unavailable, the interface says so.

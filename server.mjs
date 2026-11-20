@@ -85,6 +85,33 @@ function fallbackResult(body, sources) {
   return {summary:ar?`قراءة أولية لمشكلتك: ${desc}\n\nدي احتمالات للبحث وليست تشخيصًا مؤكدًا.`:`A first look at your report: ${desc}\n\nThese are possibilities to investigate, not a confirmed diagnosis.`,causes,actions,uncertainties:ar?['الوصف والإجابات لا تكفي لتأكيد السبب.','النتيجة تعتمد على معلومات محلية وفحص ميداني عند الحاجة.']:['The description and answers are not enough to confirm a cause.','Local records or an on-site inspection may be needed.'],expert:ar?'لو المشكلة مستمرة أو فيها خطر صحي/تشغيلي، تواصل مع جهة المياه المحلية أو مختص مؤهل.':'If the issue persists or could affect health or operations, contact the local water authority or a qualified professional.',sources};
 }
 
+const requestWindowMs = 15 * 60 * 1000;
+const requestLimit = 16;
+const requestCounts = new Map();
+function clientAddress(req) {
+  const forwarded = req.headers['x-forwarded-for'];
+  return (typeof forwarded === 'string' ? forwarded.split(',')[0].trim() : '') || req.socket.remoteAddress || 'unknown';
+}
+function allowAssistantRequest(req) {
+  const now = Date.now();
+  const key = clientAddress(req);
+  const recent = (requestCounts.get(key) || []).filter(time => now - time < requestWindowMs);
+  if (recent.length >= requestLimit) {
+    requestCounts.set(key, recent);
+    return false;
+  }
+  recent.push(now);
+  requestCounts.set(key, recent);
+  if (requestCounts.size > 5000) {
+    for (const [address, times] of requestCounts) {
+      const active = times.filter(time => now - time < requestWindowMs);
+      if (active.length) requestCounts.set(address, active);
+      else requestCounts.delete(address);
+    }
+  }
+  return true;
+}
+
 const server=http.createServer(async(req,res)=>{
   const url=new URL(req.url,'http://localhost');
   if(req.method==='GET' && url.pathname==='/api/status') return send(res,200,{ai:Boolean(process.env.OPENAI_API_KEY),research:'OpenAlex'});
@@ -92,6 +119,9 @@ const server=http.createServer(async(req,res)=>{
     try {
       const body=await readJson(req);
       if(typeof body.description!=='string'||body.description.trim().length<10) return send(res,400,{error:'Please describe the water problem in more detail.'});
+      if(body.description.length>5000 || String(body.location||'').length>120 || String(body.context||'').length>120) return send(res,400,{error:'Please shorten the description or area.'});
+      if(!['questions','result'].includes(body.stage)) return send(res,400,{error:'Unknown assistant step.'});
+      if(!allowAssistantRequest(req)) return send(res,429,{error:body.lang==='ar'?'عدد الطلبات كبير حاليًا. جرّب تاني بعد شوية.':'Too many requests right now. Please try again shortly.'});
       if(body.stage==='questions') {
         const ai=await aiCall(body).catch(()=>null);
         return send(res,200,{questions:ai?.questions?.slice(0,4)||fallbackQuestions(body),mode:ai?'ai':'guided'});
